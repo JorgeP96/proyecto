@@ -2,6 +2,8 @@ package com.ingenieria.proyecto;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.dd.acceptcriteria.Not;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
@@ -12,6 +14,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +24,16 @@ public class MiUI extends UI {
 
     @Autowired
     RepositorioProfesor repoProfe;
+    @Autowired
+    RepositorioCurso repoCurso;
 
     Grid<Profesor> profesoresMostrar = new Grid<>();
     Grid<Profesor> profesoresMostrarId = new Grid<>();
     List<Profesor> profesoresTodos = new ArrayList<>();
+
+    Grid<Curso> cursosMostrar = new Grid<>();
+    Grid<Curso> cursosMostrarId = new Grid<>();
+    List<Curso>cursosTodos = new ArrayList<>();
 
 
     @Override
@@ -48,6 +57,7 @@ public class MiUI extends UI {
         Label lblProfesorDepartamento = new Label("Departamento: ");
         TextField txtProfesorDepartamento = new TextField();
         Button btnProfesorGuardar = new Button("Guardar");
+        btnProfesorGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutProfesorGuardar.addComponents(lblProfesorId, txtProfesorId, lblProfesorNombre, txtProfesorNombre, lblProfesorTipo, txtProfesorTipo, lblProfesorDepartamento, txtProfesorDepartamento, btnProfesorGuardar);
 
         //Layout para mostrar todos los profesores
@@ -60,6 +70,27 @@ public class MiUI extends UI {
         profesoresMostrar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
         layoutProfesorMostrarTodos.addComponent(profesoresMostrar);
 
+        //Inicia layout para actualizar profesores
+        VerticalLayout layoutProfesorActualizar = new VerticalLayout();
+
+        ComboBox<Profesor> cboActualizarPro = new ComboBox<>("Seleccione");
+        List<String> actualizarPro = new ArrayList<>();
+        cboActualizarPro.clear();
+        for (Profesor p : profesoresTodos) {
+            actualizarPro.add(p.getId());
+        }
+        cboActualizarPro.setItems((List) actualizarPro);
+
+        Label lblProfesorActualizarNombre = new Label("Nombre: ");
+        TextField txtProfesorActualizarNombre = new TextField();
+        Label lblProfesorActualizarTipo = new Label("Tipo: ");
+        TextField txtProfesorActualizarTipo = new TextField();
+        Label lblProfesorActualizarDepartamento = new Label("Departamento: ");
+        TextField txtProfesorActualizarDepartamento = new TextField();
+        Button btnProfesorActualizar = new Button("Actualizar");
+        btnProfesorActualizar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        layoutProfesorActualizar.addComponents(cboActualizarPro, lblProfesorActualizarNombre, txtProfesorActualizarNombre, lblProfesorActualizarTipo, txtProfesorActualizarTipo, lblProfesorActualizarDepartamento, txtProfesorActualizarDepartamento, btnProfesorActualizar);
+
         //Layout para mostrar profesor por Id
         VerticalLayout layoutProfesorMostrarId = new VerticalLayout();
         ComboBox<Profesor> cboProfesor = new ComboBox<>("Seleccione");
@@ -71,41 +102,207 @@ public class MiUI extends UI {
         cboProfesor.setItems((List) pro);
         layoutProfesorMostrarId.addComponents(cboProfesor, profesoresMostrarId);
 
+        //Layout para eliminar profesor por Id
+        VerticalLayout layoutProfesorEliminarId = new VerticalLayout();
+        ComboBox<Profesor> cboEliminarPro = new ComboBox<>("Seleccione");
+        List<String> eliminarPro = new ArrayList<>();
+        cboEliminarPro.clear();
+        for (Profesor p : profesoresTodos) {
+            eliminarPro.add(p.getId());
+        }
+        cboEliminarPro.setItems((List) eliminarPro);
+
+        Button btnEliminarPro = new Button("Eliminar");
+        btnEliminarPro.addStyleName(ValoTheme.BUTTON_DANGER );
+
+        layoutProfesorEliminarId.addComponents(cboEliminarPro, profesoresMostrarId, btnEliminarPro);
+
+        //Inicia layout para guardar cursos
+        VerticalLayout layoutCursoGuardar = new VerticalLayout();
+        Label lblCursoId = new Label("Id: ");
+        TextField txtCursoId = new TextField();
+        Label lblCursoNombre = new Label("Nombre: ");
+        TextField txtCursoNombre = new TextField();
+        Label lblCursoDuracion = new Label("Duración: ");
+        TextField txtCursoDuracion = new TextField();
+        DateField fechaInicioCurso = new DateField();
+        Label lblCursoInicio = new Label("Inicio: ");
+        fechaInicioCurso.setValue(LocalDate.now());
+        Label lblCursoFin = new Label("Fin: ");
+        DateField fechaFinCurso = new DateField();
+        fechaFinCurso.setValue(LocalDate.now());
+        Label lblCursoHorario = new Label("Horarios: ");
+        TextField txtCursoHorario = new TextField();
+        Label lblCursoAlumnos = new Label("Alumnos: ");
+        TextField txtCursoAlumnos = new TextField();
+        Label lblCursoCosto = new Label("Costo: ");
+        TextField txtCursoCosto = new TextField();
+        Button btnCursoGuardar = new Button("Guardar");
+        btnCursoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        layoutCursoGuardar.addComponents(lblCursoId, txtCursoId , lblCursoNombre , txtCursoNombre , lblCursoDuracion, txtCursoDuracion ,lblCursoInicio,fechaInicioCurso,lblCursoFin,
+                fechaFinCurso,
+                lblCursoHorario,
+                txtCursoHorario ,
+                lblCursoAlumnos ,
+                txtCursoAlumnos ,
+                lblCursoCosto ,
+                txtCursoCosto,
+                btnCursoGuardar);
+
+        //Layout para mostrar todos los cursos
+        VerticalLayout layoutCursoMostrarTodos = new VerticalLayout();
+        cursosTodos = repoCurso.findAll();
+        cursosMostrar.setItems(cursosTodos);
+        cursosMostrar.addColumn(Curso::getIdCurso).setCaption("Id");
+        cursosMostrar.addColumn(Curso::getNombre).setCaption("Nombre");
+        cursosMostrar.addColumn(Curso::getDuracion).setCaption("Duración");
+        cursosMostrar.addColumn(Curso::getfInicio).setCaption("Inicio");
+        cursosMostrar.addColumn(Curso::getfTermino).setCaption("Fin");
+        cursosMostrar.addColumn(Curso::getHorarios).setCaption("Horario");
+        cursosMostrar.addColumn(Curso::getAlumnos).setCaption("Alumnos");
+        cursosMostrar.addColumn(Curso::getCosto).setCaption("Costo");
+        layoutCursoMostrarTodos.addComponent(cursosMostrar);
+
+        //Layout para actualizar Cursos
+
+        VerticalLayout layoutCursosActualizar = new VerticalLayout();
+
+        ComboBox<Profesor> cboActualizarCurso = new ComboBox<>("Seleccione");
+        List<String> actualizarCurso = new ArrayList<>();
+        cboActualizarCurso.clear();
+        for (Curso c : cursosTodos) {
+            actualizarCurso.add(c.getIdCurso());
+        }
+        cboActualizarCurso.setItems((List) actualizarCurso);
+
+        Label lblActualizarCursoNombre = new Label("Nombre: ");
+        TextField txtActualizarCursoNombre = new TextField();
+        Label lblActualizarCursoDuracion = new Label("Duración: ");
+        TextField txtActualizarCursoDuracion = new TextField();
+        DateField fechaInicioActualizarCurso = new DateField();
+        Label lblActualizarCursoInicio = new Label("Inicio: ");
+        fechaInicioActualizarCurso.setValue(LocalDate.now());
+        Label lblActualizarCursoFin = new Label("Fin: ");
+        DateField fechaFinActualizarCurso = new DateField();
+        fechaFinActualizarCurso.setValue(LocalDate.now());
+        Label lblActualizarCursoHorario = new Label("Horarios: ");
+        TextField txtActualizarCursoHorario = new TextField();
+        Label lblActualizarCursoAlumnos = new Label("Alumnos: ");
+        TextField txtActualizarCursoAlumnos = new TextField();
+        Label lblActualizarCursoCosto = new Label("Costo: ");
+        TextField txtActualizarCursoCosto = new TextField();
+        Button btnActualizarCurso = new Button("Actualizar");
+        btnActualizarCurso.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        layoutCursosActualizar.addComponents(cboActualizarCurso , lblActualizarCursoNombre , txtActualizarCursoNombre , lblActualizarCursoDuracion, txtActualizarCursoDuracion ,lblActualizarCursoInicio,fechaInicioActualizarCurso,lblActualizarCursoFin,
+                fechaFinActualizarCurso,
+                lblActualizarCursoHorario,
+                txtActualizarCursoHorario ,
+                lblActualizarCursoAlumnos ,
+                txtActualizarCursoAlumnos ,
+                lblActualizarCursoCosto ,
+                txtActualizarCursoCosto,
+                btnActualizarCurso);
+
+        //Layout para mostrar curso por Id
+
+        VerticalLayout layoutCursoMostrarId = new VerticalLayout();
+        ComboBox<Profesor> cboCursos = new ComboBox<>("Seleccione");
+        List<String> buscaCursos = new ArrayList<>();
+        cboCursos.clear();
+        for (Curso c : cursosTodos) {
+            buscaCursos.add(c.getIdCurso());
+        }
+        cboCursos.setItems((List) buscaCursos);
+
+        layoutCursoMostrarId.addComponents(cboCursos, cursosMostrarId);
+
+        //Layout para eliminar curso por Id
+
+        VerticalLayout layoutCursoEliminarId = new VerticalLayout();
+        ComboBox<Profesor> cboEliminarCursos = new ComboBox<>("Seleccione");
+        List<String> eliminaCursos = new ArrayList<>();
+        cboEliminarCursos.clear();
+        for (Curso c : cursosTodos) {
+            eliminaCursos.add(c.getIdCurso());
+        }
+        cboEliminarCursos.setItems((List) eliminaCursos);
+
+        Button btEliminarCursos = new Button("Eliminar");
+         btEliminarCursos.addStyleName(ValoTheme.BUTTON_DANGER);
+
+        layoutCursoEliminarId.addComponents(cboEliminarCursos, cursosMostrarId,btEliminarCursos);
+
         //Inicia menú principal
         MenuBar menuPrincipal = new MenuBar();
-        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", null);
+        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores",new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"),null);
         MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos", null);
         MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", null);
 
         //Inicia submenú profesores
         profesores.addSeparator();
         profesores.addItem("Guardar", null, selectedItem -> {
+            layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorGuardar);
             setContent(layout);
         });
         profesores.addSeparator();
-        profesores.addItem("Actualizar", null, null);
+        profesores.addItem("Actualizar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutProfesorActualizar);
+            setContent(layout);
+        });
         profesores.addSeparator();
-        profesores.addItem("Eliminar", null, null);
+        profesores.addItem("Eliminar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutProfesorEliminarId);
+            setContent(layout);
+        });
         profesores.addSeparator();
-        profesores.addItem("Mostrar", null, null);
+        profesores.addItem("Mostrar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutProfesorMostrarTodos);
+            setContent(layout);
+        });
         profesores.addSeparator();
         profesores.addItem("Buscar", null, selectedItem -> {
+            layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorMostrarId);
+            setContent(layout);
         });
         profesores.addSeparator();
 
         //Inicia submenú cursos
         cursos.addSeparator();
-        cursos.addItem("Guardar", null, null);
+        cursos.addItem("Guardar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutCursoGuardar);
+            setContent(layout);
+        });
+
         cursos.addSeparator();
-        cursos.addItem("Actualizar", null, null);
+        cursos.addItem("Actualizar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutCursosActualizar);
+            setContent(layout);
+        });
         cursos.addSeparator();
-        cursos.addItem("Eliminar", null, null);
+        cursos.addItem("Eliminar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutCursoEliminarId);
+            setContent(layout);
+        });
         cursos.addSeparator();
-        cursos.addItem("Mostrar", null, null);
+        cursos.addItem("Mostrar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutCursoMostrarTodos);
+            setContent(layout);
+        });
         cursos.addSeparator();
-        cursos.addItem("Buscar", null, null);
+        cursos.addItem("Buscar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutCursoMostrarId);
+            setContent(layout);
+        });
 
         //Inicia submenú alumnos
         alumnos.addSeparator();
@@ -176,5 +373,36 @@ public class MiUI extends UI {
             profesoresMostrarId.addColumn(Profesor::getDepartamento).setCaption("Departamento");
             layoutProfesorMostrarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
+
+        //Evento del comboBox para eliminar profesor por Id
+            cboEliminarPro.addValueChangeListener(event -> {
+            profesoresMostrarId.removeAllColumns();
+            String id = cboEliminarPro.getSelectedItem().toString().replace("Optional[","").replace("]","");
+            Profesor profe = repoProfe.findOne(id);
+            profesoresMostrarId.setItems(profe);
+            profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
+            profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
+            profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
+            profesoresMostrarId.addColumn(Profesor::getDepartamento).setCaption("Departamento");
+            layoutProfesorEliminarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
+        });
+
+        //Evento del comboBox para mostrar curso por Id
+            cboCursos.addValueChangeListener(event -> {
+            cursosMostrarId.removeAllColumns();
+            String id = cboCursos.getSelectedItem().toString().replace("Optional[","").replace("]","");
+            Curso curso = repoCurso.findOne(id);
+            cursosMostrarId.setItems(curso);
+                cursosMostrarId.addColumn(Curso::getIdCurso).setCaption("Id");
+                cursosMostrarId.addColumn(Curso::getNombre).setCaption("Nombre");
+                cursosMostrarId.addColumn(Curso::getDuracion).setCaption("Duración");
+                cursosMostrarId.addColumn(Curso::getfInicio).setCaption("Inicio");
+                cursosMostrarId.addColumn(Curso::getfTermino).setCaption("Fin");
+                cursosMostrarId.addColumn(Curso::getHorarios).setCaption("Horario");
+                cursosMostrarId.addColumn(Curso::getAlumnos).setCaption("Alumnos");
+                cursosMostrarId.addColumn(Curso::getCosto).setCaption("Costo");
+            layoutCursoMostrarId.replaceComponent(cursosMostrarId, cursosMostrarId);
+        });
+
     }
 }
