@@ -232,10 +232,24 @@ public class MiUI extends UI {
 
         layoutCursoEliminarId.addComponents(cboEliminarCursos, cursosMostrarId,btEliminarCursos);
 
+        //Inicia layout para guardar Alumnoes
+        VerticalLayout layoutAlumnoGuardar = new VerticalLayout();
+        Label lblAlumnoId = new Label("Id: ");
+        TextField txtAlumnoId = new TextField();
+        Label lblAlumnoNombre = new Label("Nombre: ");
+        TextField txtAlumnoNombre = new TextField();
+        Label lblAlumnoTipo = new Label("Tipo: ");
+        TextField txtAlumnoTipo = new TextField();
+        Label lblAlumnoCurso = new Label("Curso: ");
+        TextField txtAlumnoDepartamento = new TextField();
+        Button btnAlumnoGuardar = new Button("Guardar");
+        btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
+        layoutAlumnoGuardar.addComponents(lblAlumnoId, txtAlumnoId, lblAlumnoNombre, txtAlumnoNombre, lblAlumnoTipo, txtAlumnoTipo, lblAlumnoCurso, txtAlumnoDepartamento, btnAlumnoGuardar);
+
         //Inicia menú principal
         MenuBar menuPrincipal = new MenuBar();
         MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores",new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"),null);
-        MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos", null);
+        MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos",new ExternalResource("https://www.dropbox.com/s/a9io8l9m4l7vs8n/padnote.png"), null);
         MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", null);
 
         //Inicia submenú profesores
@@ -306,7 +320,11 @@ public class MiUI extends UI {
 
         //Inicia submenú alumnos
         alumnos.addSeparator();
-        alumnos.addItem("Guardar", null, null);
+        alumnos.addItem("Guardar", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutAlumnoGuardar);
+            setContent(layout);
+        });
         alumnos.addSeparator();
         alumnos.addItem("Actualizar", null, null);
         alumnos.addSeparator();
