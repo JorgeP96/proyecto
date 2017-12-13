@@ -1,6 +1,7 @@
 package com.ingenieria.proyecto;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.*;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.QueryAnnotation;
 import org.springframework.data.mongodb.repository.Query;
 
+import javax.swing.*;
+import javax.xml.soap.Text;
 import java.util.*;
 
 @SpringUI
@@ -164,31 +167,41 @@ public class MiUI extends UI {
 
 
         //Inicia layout para guardar Alumnos
-        VerticalLayout layoutAlumnoGuardar = new VerticalLayout();
-        TextField txtAlumnoNombre = new TextField();
-        txtAlumnoNombre.setPlaceholder("Nombre");
-        cboAlumnoTipo.setPlaceholder("Tipo");
-        cboAlumnoCurso.setPlaceholder("Curso");
+        FormLayout lGuardarAlumno = new FormLayout();
+        TextField txtNombreAlumno = new TextField();
+        txtNombreAlumno.setPlaceholder("Nombre");
+        txtNombreAlumno.setIcon(VaadinIcons.USER);
+        txtNombreAlumno.setRequiredIndicatorVisible(true);
+        cboAlumnoTipo.setIcon(VaadinIcons.USERS);
+        cboAlumnoTipo.setRequiredIndicatorVisible(true);
+        cboAlumnoCurso.setIcon(VaadinIcons.NOTEBOOK);
+        cboAlumnoCurso.setRequiredIndicatorVisible(true);
         TextArea txtCursoInscribir = new TextArea();
+        txtCursoInscribir.setIcon(VaadinIcons.INFO);
         txtCursoInscribir.setEnabled(false);
         Button btnAlumnoGuardar = new Button("Guardar");
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutAlumnoGuardar.addComponents(txtAlumnoNombre, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
+        lGuardarAlumno.addComponents(txtNombreAlumno, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
+        //Termina layout para guardar alumnos
 
-        /*Layout para mostrar todos los alumnos
-        VerticalLayout layoutAlumnosMostrarTodos = new VerticalLayout();
-        alumnosTodos = repoAlumno.findAll();
-        alumnosMostrar.setItems(alumnosTodos);
-        alumnosMostrar.addColumn(Alumno::getId).setCaption("Id");
-        alumnosMostrar.addColumn(Alumno::getNombre).setCaption("Nombre");
-        alumnosMostrar.addColumn(Alumno::getTipo).setCaption("Tipo");
-        alumnosMostrar.addColumn(Alumno::getCurso).setCaption("Curso");
-        layoutAlumnosMostrarTodos.addComponent(alumnosMostrar);*/
+        //Layout para mostrar estadisticas
+        HorizontalLayout layoutEstadistica = new HorizontalLayout();
+        TextArea estadisticas1 = new TextArea();
+        estadisticas1.setEnabled(false);
+        TextArea estadisticas2 = new TextArea();
+        estadisticas2.setEnabled(false);
+        if(alumnosTodosCurso1.size() > 0)
+        estadisticas1.setValue("Curso: " + alumnosTodosCurso1.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso1.size());
+        if(alumnosTodosCurso2.size() > 0)
+        estadisticas2.setValue("Curso: " + alumnosTodosCurso2.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso2.size());
+
+        layoutEstadistica.addComponents(estadisticas1, estadisticas2);
+        //Termina layout para mostrar estadisticas
 
 
         MenuBar menuPrincipal = new MenuBar();
-        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"), null);
-        MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", null);
+            MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"), null);
+        MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", new ExternalResource("https://www.flaticon.com/free-icon/graduate-student-avatar_67902#term=student&page=1&position=6"),null);
 
         //Inicia submenú profesores
         profesores.addSeparator();
@@ -228,7 +241,13 @@ public class MiUI extends UI {
         alumnos.addSeparator();
         alumnos.addItem("Inscripción", null, selectedItem -> {
             layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutAlumnoGuardar);
+            layout.addComponents(layoutPrincipal, lGuardarAlumno);
+            setContent(layout);
+        });
+        alumnos.addSeparator();
+        alumnos.addItem("Estadísticas", null, selectedItem -> {
+            layout.removeAllComponents();
+            layout.addComponents(layoutPrincipal, layoutEstadistica);
             setContent(layout);
         });
         layoutPrincipal.addComponents(etiqueta, menuPrincipal);
@@ -348,7 +367,7 @@ public class MiUI extends UI {
         btnAlumnoGuardar.addClickListener(event -> {
             //Datos del alumno
             String aId = "";
-            String aNombre = txtAlumnoNombre.getValue();
+            String aNombre = txtNombreAlumno.getValue();
             String aTipo = cboAlumnoTipo.getSelectedItem().toString().replace("Optional[", "").replace("]", "").toLowerCase();
             StringTokenizer st = new StringTokenizer(aNombre);
             String cId = cboAlumnoCurso.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
@@ -412,7 +431,7 @@ public class MiUI extends UI {
                 Curso curso = new Curso(cId, cNombre, cDuracion, cInicio, cTermino, cHorarios, cCosto);
                 Alumno alumno = new Alumno(aId, aNombre, aTipo, curso);
                 repoAlumno.save(alumno);
-                txtAlumnoNombre.setValue("");
+                txtNombreAlumno.setValue("");
                 cboAlumnoTipo.setValue("");
                 cboAlumnoCurso.setValue("");
                 txtCursoInscribir.setValue("");
