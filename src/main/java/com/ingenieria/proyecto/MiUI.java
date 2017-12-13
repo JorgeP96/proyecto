@@ -181,7 +181,6 @@ public class MiUI extends UI {
         txtCursoInscribir.setIcon(VaadinIcons.INFO);
         txtCursoInscribir.setEnabled(false);
         Button btnAlumnoGuardar = new Button("Guardar");
-        btnAlumnoGuardar.setEnabled(false);
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         lGuardarAlumno.addComponents(txtNombreAlumno, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
         //Termina layout para guardar alumnos
