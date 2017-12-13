@@ -8,11 +8,11 @@ public class Alumno extends Persona {
         super(id);
     }
 
-    public Alumno(String nombre, String tipo, String departamento, Curso curso) {
-        super(nombre, tipo, departamento, curso);
+    public Alumno(String nombre, String tipo, Curso curso) {
+        super(nombre, tipo, curso);
     }
 
-    public Alumno(String id, String nombre, String tipo, String departamento, Curso curso) {
-        super(id, nombre, tipo, departamento, curso);
+    public Alumno(String id, String nombre, String tipo, Curso curso) {
+        super(id, nombre, tipo, curso);
     }
 }

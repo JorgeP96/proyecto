@@ -67,7 +67,6 @@ public class MiUI extends UI {
         profesoresMostrar.addColumn(Profesor::getId).setCaption("Id");
         profesoresMostrar.addColumn(Profesor::getNombre).setCaption("Nombre");
         profesoresMostrar.addColumn(Profesor::getTipo).setCaption("Tipo");
-        profesoresMostrar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
         layoutProfesorMostrarTodos.addComponent(profesoresMostrar);
 
         //Inicia layout para actualizar profesores
@@ -246,6 +245,9 @@ public class MiUI extends UI {
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutAlumnoGuardar.addComponents(lblAlumnoId, txtAlumnoId, lblAlumnoNombre, txtAlumnoNombre, lblAlumnoTipo, txtAlumnoTipo, lblAlumnoCurso, txtAlumnoDepartamento, btnAlumnoGuardar);
 
+        ThemeResource resource = new ThemeResource("../egel.png");
+        Image imagen = new Image(null, resource);
+
         //Inicia menú principal
         MenuBar menuPrincipal = new MenuBar();
         MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores",new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"),null);
@@ -361,7 +363,7 @@ public class MiUI extends UI {
             }
 
             if (estatus.isStatus() == true) {
-                Profesor profesor = new Profesor(pId, pNombre, pTipo, pDepartamento, new Curso());
+                Profesor profesor = new Profesor(pId, pNombre, pTipo, new Curso(), pDepartamento);
                 repoProfe.save(profesor);
                 txtProfesorId.setValue("");
                 txtProfesorNombre.setValue("");
@@ -388,7 +390,6 @@ public class MiUI extends UI {
             profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
             profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
             profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
-            profesoresMostrarId.addColumn(Profesor::getDepartamento).setCaption("Departamento");
             layoutProfesorMostrarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
 
@@ -401,7 +402,6 @@ public class MiUI extends UI {
             profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
             profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
             profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
-            profesoresMostrarId.addColumn(Profesor::getDepartamento).setCaption("Departamento");
             layoutProfesorEliminarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
 
