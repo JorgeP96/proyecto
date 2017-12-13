@@ -27,8 +27,13 @@ public class MiUI extends UI {
     @Autowired
     RepositorioCurso repoCurso;
 
+    //Grid para mostrar todos los profesores
     Grid<Profesor> profesoresMostrar = new Grid<>();
+
+    //Grid para mostrar profesor por Id
     Grid<Profesor> profesoresMostrarId = new Grid<>();
+
+    //Lista para guardar todos
     List<Profesor> profesoresTodos = new ArrayList<>();
 
     Grid<Curso> cursosMostrar = new Grid<>();
@@ -59,6 +64,8 @@ public class MiUI extends UI {
         Button btnProfesorGuardar = new Button("Guardar");
         btnProfesorGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutProfesorGuardar.addComponents(lblProfesorId, txtProfesorId, lblProfesorNombre, txtProfesorNombre, lblProfesorTipo, txtProfesorTipo, lblProfesorDepartamento, txtProfesorDepartamento, btnProfesorGuardar);
+        //Termina layout para guardar profesores
+
 
         //Layout para mostrar todos los profesores
         VerticalLayout layoutProfesorMostrarTodos = new VerticalLayout();
@@ -68,6 +75,8 @@ public class MiUI extends UI {
         profesoresMostrar.addColumn(Profesor::getNombre).setCaption("Nombre");
         profesoresMostrar.addColumn(Profesor::getTipo).setCaption("Tipo");
         layoutProfesorMostrarTodos.addComponent(profesoresMostrar);
+        //Termina layout para mostrar todos los profesores
+
 
         //Inicia layout para actualizar profesores
         VerticalLayout layoutProfesorActualizar = new VerticalLayout();
@@ -373,6 +382,7 @@ public class MiUI extends UI {
                 Notification.show(estatus.getMensaje(), Notification.Type.WARNING_MESSAGE);
                 profesoresTodos = repoProfe.findAll();
                 cboProfesor.clear();
+                cboActualizarPro.clear();
                 for (Profesor p : profesoresTodos) {
                     pro.add(p.getId());
                 }
