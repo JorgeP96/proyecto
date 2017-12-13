@@ -107,13 +107,13 @@ public class MiUI extends UI {
         //Layout para mostrar profesor por Id
         VerticalLayout layoutProfesorMostrarId = new VerticalLayout();
         ComboBox<Profesor> cboProfesorMostrarId = new ComboBox<>();
-        List<String> pro = new ArrayList<>();
+        List<String> lsProfesorMostrarId = new ArrayList<>();
         cboProfesorMostrarId.clear();
-        pro.add("Seleccione");
+        lsProfesorMostrarId.add("Seleccione");
         for (Profesor p : profesoresTodos) {
-            pro.add(p.getId());
+            lsProfesorMostrarId.add(p.getId());
         }
-        cboProfesorMostrarId.setItems((List) pro);
+        cboProfesorMostrarId.setItems((List) lsProfesorMostrarId);
         layoutProfesorMostrarId.addComponents(cboProfesorMostrarId, profesoresMostrarId);
 
         //Layout para eliminar profesor por Id
@@ -395,11 +395,14 @@ public class MiUI extends UI {
                 profesoresTodos = repoProfe.findAll();
                 cboProfesorMostrarId.clear();
                 cboProfesorActualizar.clear();
-                cboProfesorEliminar
+                cboProfesorEliminar.clear();
+                lsProfesorMostrarId.clear();
                 for (Profesor p : profesoresTodos) {
-                    pro.add(p.getId());
+                    lsProfesorMostrarId.add(p.getId());
                 }
-                cboProfesorMostrarId.setItems((List) pro);
+                cboProfesorMostrarId.setItems((List) lsProfesorMostrarId);
+                cboProfesorActualizar.setItems((List) lsProfesorMostrarId);
+                cboProfesorEliminar.setItems((List) lsProfesorMostrarId);
             } else {
                 Notification.show(estatus.getMensaje(), Notification.Type.ERROR_MESSAGE);
             }
