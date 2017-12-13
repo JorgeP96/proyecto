@@ -95,15 +95,23 @@ public class MiUI extends UI {
 
 
         //Inicia layout para guardar profesores
-        VerticalLayout layoutProfesorGuardar = new VerticalLayout();
+        FormLayout layoutProfesorGuardar = new FormLayout();
         TextField txtProfesorId = new TextField();
         txtProfesorId.setPlaceholder("Id");
+        txtProfesorId.setIcon(VaadinIcons.USER_CARD);
+        txtProfesorId.setRequiredIndicatorVisible(true);
         TextField txtProfesorNombre = new TextField();
         txtProfesorNombre.setPlaceholder("Nombre");
+        txtProfesorNombre.setIcon(VaadinIcons.USER);
+        txtProfesorNombre.setRequiredIndicatorVisible(true);
         TextField txtProfesorTipo = new TextField();
         txtProfesorTipo.setPlaceholder("Tipo");
+        txtProfesorTipo.setIcon(VaadinIcons.USER_CHECK);
+        txtProfesorTipo.setRequiredIndicatorVisible(true);
         TextField txtProfesorDepartamento = new TextField();
         txtProfesorDepartamento.setPlaceholder("Departamento");
+        txtProfesorDepartamento.setIcon(VaadinIcons.USER_STAR);
+        txtProfesorDepartamento.setRequiredIndicatorVisible(true);
         Button btnProfesorGuardar = new Button("Guardar");
         btnProfesorGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutProfesorGuardar.addComponents(txtProfesorId, txtProfesorNombre, txtProfesorTipo, txtProfesorDepartamento, btnProfesorGuardar);
@@ -122,7 +130,7 @@ public class MiUI extends UI {
 
 
         //Inicia layout para actualizar profesor por Id
-        VerticalLayout layoutProfesorActualizar = new VerticalLayout();
+        FormLayout layoutProfesorActualizar = new FormLayout();
         List<String> idProfes = new ArrayList<>();
         cboProfesorActualizar.clear();
         cboProfesorActualizar.setPlaceholder("Id");
@@ -131,14 +139,24 @@ public class MiUI extends UI {
         }
         cboProfesorActualizar.setItems((List) idProfes);
         cboProfesorActualizar.setScrollToSelectedItem(true);
+        cboProfesorActualizar.setIcon(VaadinIcons.USER_CARD);
+        cboProfesorActualizar.setRequiredIndicatorVisible(true);
         TextField txtProfesorActualizarNombre = new TextField();
         txtProfesorActualizarNombre.setPlaceholder("Nombre");
+        txtProfesorActualizarNombre.setIcon(VaadinIcons.USER);
+        txtProfesorActualizarNombre.setRequiredIndicatorVisible(true);
         TextField txtProfesorActualizarTipo = new TextField();
         txtProfesorActualizarTipo.setPlaceholder("Tipo");
+        txtProfesorActualizarTipo.setIcon(VaadinIcons.USER_CHECK);
+        txtProfesorActualizarTipo.setRequiredIndicatorVisible(true);
         TextField txtProfesorActualizarDepartamento = new TextField();
         txtProfesorActualizarDepartamento.setPlaceholder("Departamento");
+        txtProfesorActualizarDepartamento.setIcon(VaadinIcons.USER_STAR);
+        txtProfesorActualizarDepartamento.setRequiredIndicatorVisible(true);
         TextField txtProfesorActualizarCurso = new TextField();
         txtProfesorActualizarCurso.setPlaceholder("Curso");
+        txtProfesorActualizarCurso.setIcon(VaadinIcons.NOTEBOOK);
+        txtProfesorActualizarCurso.setRequiredIndicatorVisible(true);
         Button btnProfesorActualizar = new Button("Actualizar");
         btnProfesorActualizar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutProfesorActualizar.addComponents(cboProfesorActualizar, txtProfesorActualizarNombre, txtProfesorActualizarTipo, txtProfesorActualizarDepartamento, txtProfesorActualizarCurso, btnProfesorActualizar);
@@ -206,31 +224,31 @@ public class MiUI extends UI {
 
         //Inicia submenú profesores
         profesores.addSeparator();
-        profesores.addItem("Guardar", null, selectedItem -> {
+        profesores.addItem("Guardar", VaadinIcons.USERS, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorGuardar);
             setContent(layout);
         });
         profesores.addSeparator();
-        profesores.addItem("Actualizar", null, selectedItem -> {
+        profesores.addItem("Actualizar", VaadinIcons.REFRESH, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorActualizar);
             setContent(layout);
         });
         profesores.addSeparator();
-        profesores.addItem("Eliminar", null, selectedItem -> {
+        profesores.addItem("Eliminar", VaadinIcons.TRASH, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorEliminar);
             setContent(layout);
         });
         profesores.addSeparator();
-        profesores.addItem("Mostrar", null, selectedItem -> {
+        profesores.addItem("Mostrar", VaadinIcons.EYE, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorMostrarTodos);
             setContent(layout);
         });
         profesores.addSeparator();
-        profesores.addItem("Buscar", null, selectedItem -> {
+                profesores.addItem("Buscar", VaadinIcons.SEARCH, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutProfesorMostrarId);
             setContent(layout);
