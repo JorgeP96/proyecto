@@ -1,51 +1,86 @@
 package com.ingenieria.proyecto;
 
 import com.vaadin.annotations.Theme;
-import com.vaadin.event.dd.acceptcriteria.Not;
 import com.vaadin.server.*;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.QueryAnnotation;
+import org.springframework.data.mongodb.repository.Query;
 
-import java.io.File;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @SpringUI
 @Theme("valo")
 public class MiUI extends UI {
 
+    public static String cId;
     @Autowired
     RepositorioProfesor repoProfe;
     @Autowired
-    RepositorioCurso repoCurso;
-    @Autowired
     RepositorioAlumno repoAlumno;
 
+    //Profesor
     //Grid para mostrar todos los profesores
     Grid<Profesor> profesoresMostrar = new Grid<>();
     //Grid para mostrar profesor por Id
     Grid<Profesor> profesoresMostrarId = new Grid<>();
-    //Lista para guardar todos
+    //Grid para eliminar profesor
+    Grid<Profesor> profesoresEliminar = new Grid<>();
+    //Lista para guardar todos profesores obtenidos
     List<Profesor> profesoresTodos = new ArrayList<>();
+    //Lista para guardar id de todos profesores obtenidos
+    List<String> lsProfesorId = new ArrayList<>();
 
-    Grid<Curso> cursosMostrar = new Grid<>();
-    Grid<Curso> cursosMostrarId = new Grid<>();
-    List<Curso> cursosTodos = new ArrayList<>();
+    //Lista para mostrar los cursos disponibles a inscribir
+    List<Profesor> lsCursoId = new ArrayList<>();
 
-    Grid<Alumno> alumnosMostrar = new Grid<>();
-    Grid<Alumno> alumnosMostrarId = new Grid<>();
-    List<Alumno>alumnosTodos = new ArrayList<>();
+    //Combobox para mostrar id de profesor para buscar
+    ComboBox<Profesor> cboProfesorMostrarId = new ComboBox<>();
+    //Combobox para mostrar id de profesor para actualizar
+    ComboBox<Profesor> cboProfesorActualizar = new ComboBox<>();
+    //Combobox para mostrar id de profesor para eliminar
+    ComboBox<Profesor> cboProfesorEliminar = new ComboBox<>();
+
+    //Combobox para mostrar tipo de alumno al inscribirse
+    ComboBox cboAlumnoTipo = new ComboBox();
+    List<String> lsAlumnoTipo = new ArrayList<>();
+
+
+    //Combobox para mostrar curso a inscribir para alumno
+    ComboBox cboAlumnoCurso = new ComboBox();
+    List<String> lsAlumnoCurso = new ArrayList<>();
+
+    Profesor profe;
+
+    List<Alumno> alumnosTodosCurso1 = new ArrayList<>();
+    List<Alumno> alumnosTodosCurso2 = new ArrayList<>();
 
 
     @Override
     protected void init(VaadinRequest request) {
+
+        profesoresTodos = repoProfe.findAll();
+        alumnosTodosCurso1 = repoAlumno.find1();
+        alumnosTodosCurso2 = repoAlumno.find2();
+
+        if (profesoresTodos.size() > 0) {
+            for (Profesor p : profesoresTodos) {
+                lsProfesorId.add(p.getId());
+                lsAlumnoCurso.add(p.getCurso().getIdCurso());
+            }
+            cboProfesorMostrarId.setItems((List) lsProfesorId);
+            cboProfesorActualizar.setItems((List) lsProfesorId);
+            cboProfesorEliminar.setItems((List) lsProfesorId);
+            cboAlumnoCurso.setItems((List) lsAlumnoCurso);
+        }
+
+        lsAlumnoTipo.add("Interno");
+        lsAlumnoTipo.add("Externo");
+        cboAlumnoTipo.setItems(lsAlumnoTipo);
+
+
         //Layout principal, aquí pondré todos los otros layouts
         VerticalLayout layout = new VerticalLayout();
 
@@ -54,213 +89,93 @@ public class MiUI extends UI {
         Label etiqueta = new Label("Aplicación de Cursos");
         etiqueta.addStyleName(ValoTheme.LABEL_H1);
 
+
         //Inicia layout para guardar profesores
         VerticalLayout layoutProfesorGuardar = new VerticalLayout();
-        Label lblProfesorId = new Label("Id: ");
         TextField txtProfesorId = new TextField();
-        Label lblProfesorNombre = new Label("Nombre: ");
+        txtProfesorId.setPlaceholder("Id");
         TextField txtProfesorNombre = new TextField();
-        Label lblProfesorTipo = new Label("Tipo: ");
+        txtProfesorNombre.setPlaceholder("Nombre");
         TextField txtProfesorTipo = new TextField();
-        Label lblProfesorDepartamento = new Label("Departamento: ");
+        txtProfesorTipo.setPlaceholder("Tipo");
         TextField txtProfesorDepartamento = new TextField();
+        txtProfesorDepartamento.setPlaceholder("Departamento");
         Button btnProfesorGuardar = new Button("Guardar");
         btnProfesorGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutProfesorGuardar.addComponents(lblProfesorId, txtProfesorId, lblProfesorNombre, txtProfesorNombre, lblProfesorTipo, txtProfesorTipo, lblProfesorDepartamento, txtProfesorDepartamento, btnProfesorGuardar);
+        layoutProfesorGuardar.addComponents(txtProfesorId, txtProfesorNombre, txtProfesorTipo, txtProfesorDepartamento, btnProfesorGuardar);
         //Termina layout para guardar profesores
 
 
         //Layout para mostrar todos los profesores
         VerticalLayout layoutProfesorMostrarTodos = new VerticalLayout();
-        profesoresTodos = repoProfe.findAll();
         profesoresMostrar.setItems(profesoresTodos);
         profesoresMostrar.addColumn(Profesor::getId).setCaption("Id");
         profesoresMostrar.addColumn(Profesor::getNombre).setCaption("Nombre");
         profesoresMostrar.addColumn(Profesor::getTipo).setCaption("Tipo");
+        profesoresMostrar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
         layoutProfesorMostrarTodos.addComponent(profesoresMostrar);
         //Termina layout para mostrar todos los profesores
 
 
-        //Inicia layout para actualizar profesor
+        //Inicia layout para actualizar profesor por Id
         VerticalLayout layoutProfesorActualizar = new VerticalLayout();
-        ComboBox<Profesor> cboProfesorActualizar = new ComboBox<>();
         List<String> idProfes = new ArrayList<>();
         cboProfesorActualizar.clear();
+        cboProfesorActualizar.setPlaceholder("Id");
         for (Profesor p : profesoresTodos) {
             idProfes.add(p.getId());
         }
         cboProfesorActualizar.setItems((List) idProfes);
         cboProfesorActualizar.setScrollToSelectedItem(true);
-        Label lblProfesorActualizarNombre = new Label("Nombre: ");
         TextField txtProfesorActualizarNombre = new TextField();
-        Label lblProfesorActualizarTipo = new Label("Tipo: ");
+        txtProfesorActualizarNombre.setPlaceholder("Nombre");
         TextField txtProfesorActualizarTipo = new TextField();
-        Label lblProfesorActualizarDepartamento = new Label("Departamento: ");
+        txtProfesorActualizarTipo.setPlaceholder("Tipo");
         TextField txtProfesorActualizarDepartamento = new TextField();
-        Label lblProfesorActualizarCurso = new Label("Curso: ");
+        txtProfesorActualizarDepartamento.setPlaceholder("Departamento");
         TextField txtProfesorActualizarCurso = new TextField();
+        txtProfesorActualizarCurso.setPlaceholder("Curso");
         Button btnProfesorActualizar = new Button("Actualizar");
         btnProfesorActualizar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutProfesorActualizar.addComponents(cboProfesorActualizar, lblProfesorActualizarNombre, txtProfesorActualizarNombre, lblProfesorActualizarTipo, txtProfesorActualizarTipo, lblProfesorActualizarDepartamento, txtProfesorActualizarDepartamento, lblProfesorActualizarCurso, txtProfesorActualizarCurso,btnProfesorActualizar);
-        //Termina layout para actualizar profesor
+        layoutProfesorActualizar.addComponents(cboProfesorActualizar, txtProfesorActualizarNombre, txtProfesorActualizarTipo, txtProfesorActualizarDepartamento, txtProfesorActualizarCurso, btnProfesorActualizar);
+        //Termina layout para actualizar profesor por Id
+
 
         //Layout para mostrar profesor por Id
         VerticalLayout layoutProfesorMostrarId = new VerticalLayout();
-        ComboBox<Profesor> cboProfesorMostrarId = new ComboBox<>();
-        List<String> lsProfesorMostrarId = new ArrayList<>();
-        cboProfesorMostrarId.clear();
-        lsProfesorMostrarId.add("Seleccione");
-        for (Profesor p : profesoresTodos) {
-            lsProfesorMostrarId.add(p.getId());
-        }
-        cboProfesorMostrarId.setItems((List) lsProfesorMostrarId);
+        cboProfesorMostrarId.setPlaceholder("Id");
+        cboProfesorMostrarId.setItems((List) lsProfesorId);
         layoutProfesorMostrarId.addComponents(cboProfesorMostrarId, profesoresMostrarId);
+        //Termina layout para mostrar profesor por Id
+
 
         //Layout para eliminar profesor por Id
         VerticalLayout layoutProfesorEliminar = new VerticalLayout();
-        ComboBox<Profesor> cboProfesorEliminar = new ComboBox<>("Seleccione");
-        List<String> eliminarPro = new ArrayList<>();
-        cboProfesorEliminar.clear();
+        List<String> lsProfesorEliminar = new ArrayList<>();
+        cboProfesorEliminar.setPlaceholder("Id");
         for (Profesor p : profesoresTodos) {
-            eliminarPro.add(p.getId());
+            lsProfesorEliminar.add(p.getId());
         }
-        cboProfesorEliminar.setItems((List) eliminarPro);
+        cboProfesorEliminar.setItems((List) lsProfesorEliminar);
+        Button btnEliminarProfesor = new Button("Eliminar");
+        btnEliminarProfesor.addStyleName(ValoTheme.BUTTON_DANGER);
+        layoutProfesorEliminar.addComponents(cboProfesorEliminar, profesoresEliminar, btnEliminarProfesor);
+        //Termina layout para eliminar profesor por Id
 
-        Button btnEliminarPro = new Button("Eliminar");
-        btnEliminarPro.addStyleName(ValoTheme.BUTTON_DANGER );
 
-        layoutProfesorEliminar.addComponents(cboProfesorEliminar, profesoresMostrarId, btnEliminarPro);
-
-        //Inicia layout para guardar cursos
-        VerticalLayout layoutCursoGuardar = new VerticalLayout();
-        Label lblCursoId = new Label("Id: ");
-        TextField txtCursoId = new TextField();
-        Label lblCursoNombre = new Label("Nombre: ");
-        TextField txtCursoNombre = new TextField();
-        Label lblCursoDuracion = new Label("Duración: ");
-        TextField txtCursoDuracion = new TextField();
-        DateField fechaInicioCurso = new DateField();
-        Label lblCursoInicio = new Label("Inicio: ");
-        fechaInicioCurso.setValue(LocalDate.now());
-        Label lblCursoFin = new Label("Fin: ");
-        DateField fechaFinCurso = new DateField();
-        fechaFinCurso.setValue(LocalDate.now());
-        Label lblCursoHorario = new Label("Horarios: ");
-        TextField txtCursoHorario = new TextField();
-        Label lblCursoAlumnos = new Label("Alumnos: ");
-        TextField txtCursoAlumnos = new TextField();
-        Label lblCursoCosto = new Label("Costo: ");
-        TextField txtCursoCosto = new TextField();
-        Button btnCursoGuardar = new Button("Guardar");
-        btnCursoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutCursoGuardar.addComponents(lblCursoId, txtCursoId , lblCursoNombre , txtCursoNombre , lblCursoDuracion, txtCursoDuracion ,lblCursoInicio,fechaInicioCurso,lblCursoFin,
-                fechaFinCurso,
-                lblCursoHorario,
-                txtCursoHorario ,
-                lblCursoAlumnos ,
-                txtCursoAlumnos ,
-                lblCursoCosto ,
-                txtCursoCosto,
-                btnCursoGuardar);
-
-        //Layout para mostrar todos los cursos
-        VerticalLayout layoutCursoMostrarTodos = new VerticalLayout();
-        cursosTodos = repoCurso.findAll();
-        cursosMostrar.setItems(cursosTodos);
-        cursosMostrar.addColumn(Curso::getIdCurso).setCaption("Id");
-        cursosMostrar.addColumn(Curso::getNombre).setCaption("Nombre");
-        cursosMostrar.addColumn(Curso::getDuracion).setCaption("Duración");
-        cursosMostrar.addColumn(Curso::getfInicio).setCaption("Inicio");
-        cursosMostrar.addColumn(Curso::getfTermino).setCaption("Fin");
-        cursosMostrar.addColumn(Curso::getHorarios).setCaption("Horario");
-        cursosMostrar.addColumn(Curso::getAlumnos).setCaption("Alumnos");
-        cursosMostrar.addColumn(Curso::getCosto).setCaption("Costo");
-        layoutCursoMostrarTodos.addComponent(cursosMostrar);
-
-        //Layout para actualizar Cursos
-
-        VerticalLayout layoutCursosActualizar = new VerticalLayout();
-
-        ComboBox<Profesor> cboActualizarCurso = new ComboBox<>("Seleccione");
-        List<String> actualizarCurso = new ArrayList<>();
-        cboActualizarCurso.clear();
-        for (Curso c : cursosTodos) {
-            actualizarCurso.add(c.getIdCurso());
-        }
-        cboActualizarCurso.setItems((List) actualizarCurso);
-
-        Label lblActualizarCursoNombre = new Label("Nombre: ");
-        TextField txtActualizarCursoNombre = new TextField();
-        Label lblActualizarCursoDuracion = new Label("Duración: ");
-        TextField txtActualizarCursoDuracion = new TextField();
-        DateField fechaInicioActualizarCurso = new DateField();
-        Label lblActualizarCursoInicio = new Label("Inicio: ");
-        fechaInicioActualizarCurso.setValue(LocalDate.now());
-        Label lblActualizarCursoFin = new Label("Fin: ");
-        DateField fechaFinActualizarCurso = new DateField();
-        fechaFinActualizarCurso.setValue(LocalDate.now());
-        Label lblActualizarCursoHorario = new Label("Horarios: ");
-        TextField txtActualizarCursoHorario = new TextField();
-        Label lblActualizarCursoAlumnos = new Label("Alumnos: ");
-        TextField txtActualizarCursoAlumnos = new TextField();
-        Label lblActualizarCursoCosto = new Label("Costo: ");
-        TextField txtActualizarCursoCosto = new TextField();
-        Button btnActualizarCurso = new Button("Actualizar");
-        btnActualizarCurso.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutCursosActualizar.addComponents(cboActualizarCurso , lblActualizarCursoNombre , txtActualizarCursoNombre , lblActualizarCursoDuracion, txtActualizarCursoDuracion ,lblActualizarCursoInicio,fechaInicioActualizarCurso,lblActualizarCursoFin,
-                fechaFinActualizarCurso,
-                lblActualizarCursoHorario,
-                txtActualizarCursoHorario ,
-                lblActualizarCursoAlumnos ,
-                txtActualizarCursoAlumnos ,
-                lblActualizarCursoCosto ,
-                txtActualizarCursoCosto,
-                btnActualizarCurso);
-
-        //Layout para mostrar curso por Id
-
-        VerticalLayout layoutCursoMostrarId = new VerticalLayout();
-        ComboBox<Profesor> cboCursos = new ComboBox<>("Seleccione");
-        List<String> buscaCursos = new ArrayList<>();
-        cboCursos.clear();
-        for (Curso c : cursosTodos) {
-            buscaCursos.add(c.getIdCurso());
-        }
-        cboCursos.setItems((List) buscaCursos);
-
-        layoutCursoMostrarId.addComponents(cboCursos, cursosMostrarId);
-
-        //Layout para eliminar curso por Id
-
-        VerticalLayout layoutCursoEliminarId = new VerticalLayout();
-        ComboBox<Profesor> cboEliminarCursos = new ComboBox<>("Seleccione");
-        List<String> eliminaCursos = new ArrayList<>();
-        cboEliminarCursos.clear();
-        for (Curso c : cursosTodos) {
-            eliminaCursos.add(c.getIdCurso());
-        }
-        cboEliminarCursos.setItems((List) eliminaCursos);
-
-        Button btEliminarCursos = new Button("Eliminar");
-         btEliminarCursos.addStyleName(ValoTheme.BUTTON_DANGER);
-
-        layoutCursoEliminarId.addComponents(cboEliminarCursos, cursosMostrarId,btEliminarCursos);
-
-        //Inicia layout para guardar Alumnoes
+        //Inicia layout para guardar Alumnos
         VerticalLayout layoutAlumnoGuardar = new VerticalLayout();
-        Label lblAlumnoId = new Label("Id: ");
-        TextField txtAlumnoId = new TextField();
-        Label lblAlumnoNombre = new Label("Nombre: ");
         TextField txtAlumnoNombre = new TextField();
-        Label lblAlumnoTipo = new Label("Tipo: ");
-        TextField txtAlumnoTipo = new TextField();
-        Label lblAlumnoCurso = new Label("Curso: ");
-        TextField txtAlumnoDepartamento = new TextField();
+        txtAlumnoNombre.setPlaceholder("Nombre");
+        cboAlumnoTipo.setPlaceholder("Tipo");
+        cboAlumnoCurso.setPlaceholder("Curso");
+        TextArea txtCursoInscribir = new TextArea();
+        txtCursoInscribir.setEnabled(false);
         Button btnAlumnoGuardar = new Button("Guardar");
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutAlumnoGuardar.addComponents(lblAlumnoId, txtAlumnoId, lblAlumnoNombre, txtAlumnoNombre, lblAlumnoTipo, txtAlumnoTipo, lblAlumnoCurso, txtAlumnoDepartamento, btnAlumnoGuardar);
+        layoutAlumnoGuardar.addComponents(txtAlumnoNombre, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
 
-        //Layout para mostrar todos los alumnos
+        /*Layout para mostrar todos los alumnos
         VerticalLayout layoutAlumnosMostrarTodos = new VerticalLayout();
         alumnosTodos = repoAlumno.findAll();
         alumnosMostrar.setItems(alumnosTodos);
@@ -268,12 +183,11 @@ public class MiUI extends UI {
         alumnosMostrar.addColumn(Alumno::getNombre).setCaption("Nombre");
         alumnosMostrar.addColumn(Alumno::getTipo).setCaption("Tipo");
         alumnosMostrar.addColumn(Alumno::getCurso).setCaption("Curso");
-        layoutAlumnosMostrarTodos.addComponent(alumnosMostrar);
+        layoutAlumnosMostrarTodos.addComponent(alumnosMostrar);*/
 
 
         MenuBar menuPrincipal = new MenuBar();
-        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores",new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"),null);
-        MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos" , null);
+        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"), null);
         MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", null);
 
         //Inicia submenú profesores
@@ -309,59 +223,20 @@ public class MiUI extends UI {
         });
         profesores.addSeparator();
 
-        //Inicia submenú cursos
-        cursos.addSeparator();
-        cursos.addItem("Guardar", null, selectedItem -> {
-            layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutCursoGuardar);
-            setContent(layout);
-        });
-
-        cursos.addSeparator();
-        cursos.addItem("Actualizar", null, selectedItem -> {
-            layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutCursosActualizar);
-            setContent(layout);
-        });
-        cursos.addSeparator();
-        cursos.addItem("Eliminar", null, selectedItem -> {
-            layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutCursoEliminarId);
-            setContent(layout);
-        });
-        cursos.addSeparator();
-        cursos.addItem("Mostrar", null, selectedItem -> {
-            layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutCursoMostrarTodos);
-            setContent(layout);
-        });
-        cursos.addSeparator();
-        cursos.addItem("Buscar", null, selectedItem -> {
-            layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutCursoMostrarId);
-            setContent(layout);
-        });
 
         //Inicia submenú alumnos
         alumnos.addSeparator();
-        alumnos.addItem("Guardar", null, selectedItem -> {
+        alumnos.addItem("Inscripción", null, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutAlumnoGuardar);
             setContent(layout);
         });
-        alumnos.addSeparator();
-        alumnos.addItem("Actualizar", null, null);
-        alumnos.addSeparator();
-        alumnos.addItem("Eliminar", null, null);
-        alumnos.addSeparator();
-        alumnos.addItem("Mostrar", null, null);
-        alumnos.addSeparator();
-        alumnos.addItem("Buscar", null, null);
         layoutPrincipal.addComponents(etiqueta, menuPrincipal);
 
         //Agregamos componentes al layout principal
         layout.addComponents(layoutPrincipal);
         setContent(layout);
+
 
         //Evento del boton para guardar profesores
         btnProfesorGuardar.addClickListener(event -> {
@@ -385,7 +260,13 @@ public class MiUI extends UI {
             }
 
             if (estatus.isStatus() == true) {
-                Profesor profesor = new Profesor(pId, pNombre, pTipo, new Curso(), pDepartamento);
+                Profesor profesor = new Profesor(pId, pNombre, pTipo, new Curso("2",
+                        "Arte",
+                        "5 sem",
+                        "2017/12/13",
+                        "2018/01/13",
+                        "L-J",
+                        521.2F), pDepartamento);
                 repoProfe.save(profesor);
                 txtProfesorId.setValue("");
                 txtProfesorNombre.setValue("");
@@ -396,58 +277,240 @@ public class MiUI extends UI {
                 cboProfesorMostrarId.clear();
                 cboProfesorActualizar.clear();
                 cboProfesorEliminar.clear();
-                lsProfesorMostrarId.clear();
+                lsProfesorId.clear();
                 for (Profesor p : profesoresTodos) {
-                    lsProfesorMostrarId.add(p.getId());
+                    lsProfesorId.add(p.getId());
                 }
-                cboProfesorMostrarId.setItems((List) lsProfesorMostrarId);
-                cboProfesorActualizar.setItems((List) lsProfesorMostrarId);
-                cboProfesorEliminar.setItems((List) lsProfesorMostrarId);
+                cboProfesorMostrarId.setItems((List) lsProfesorId);
+                cboProfesorActualizar.setItems((List) lsProfesorId);
+                cboProfesorEliminar.setItems((List) lsProfesorId);
+                profesoresMostrar.removeAllColumns();
+                profesoresMostrar.setItems(profesoresTodos);
+                profesoresMostrar.addColumn(Profesor::getId).setCaption("Id");
+                profesoresMostrar.addColumn(Profesor::getNombre).setCaption("Nombre");
+                profesoresMostrar.addColumn(Profesor::getTipo).setCaption("Tipo");
+                profesoresMostrar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
+
             } else {
                 Notification.show(estatus.getMensaje(), Notification.Type.ERROR_MESSAGE);
             }
         });
+        //Termina evento del boton para guardar profesores
 
-        //Evento del comboBox para mostrar profesor por Id
+
+        //Evento del boton para actualizar profesores
+        btnProfesorActualizar.addClickListener(event -> {
+            String pId = cboProfesorActualizar.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
+            String pNombre = txtProfesorActualizarNombre.getValue();
+            String pTipo = txtProfesorActualizarTipo.getValue();
+            String pDepartamento = txtProfesorActualizarDepartamento.getValue();
+            Estatus estatus = new Estatus(true, "Actualización exitosa");
+
+            if (pId.equals("") || pNombre.equals("") || pTipo.equals("") || pDepartamento.equals("")) {
+                estatus.setStatus(false);
+                estatus.setMensaje("Rellena todos los campos");
+            }
+
+            if (estatus.isStatus() == true) {
+                Profesor profesor = new Profesor(pId, pNombre, pTipo, new Curso(), pDepartamento);
+                repoProfe.save(profesor);
+                cboProfesorActualizar.setPlaceholder("Id");
+                txtProfesorActualizarNombre.setValue("");
+                txtProfesorActualizarTipo.setValue("");
+                txtProfesorActualizarDepartamento.setValue("");
+                Notification.show(estatus.getMensaje(), Notification.Type.WARNING_MESSAGE);
+                profesoresTodos = repoProfe.findAll();
+                cboProfesorMostrarId.clear();
+                cboProfesorActualizar.clear();
+                cboProfesorEliminar.clear();
+                lsProfesorId.clear();
+                for (Profesor p : profesoresTodos) {
+                    lsProfesorId.add(p.getId());
+                }
+                cboProfesorMostrarId.setItems((List) lsProfesorId);
+                cboProfesorActualizar.setItems((List) lsProfesorId);
+                cboProfesorEliminar.setItems((List) lsProfesorId);
+                profesoresMostrar.removeAllColumns();
+                profesoresMostrar.setItems(profesoresTodos);
+                profesoresMostrar.addColumn(Profesor::getId).setCaption("Id");
+                profesoresMostrar.addColumn(Profesor::getNombre).setCaption("Nombre");
+                profesoresMostrar.addColumn(Profesor::getTipo).setCaption("Tipo");
+                profesoresMostrar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
+            } else {
+                Notification.show(estatus.getMensaje(), Notification.Type.ERROR_MESSAGE);
+            }
+
+        });
+        //Termina evento del boton para actualizar profesores
+
+
+        //Evento del boton para guardar alumno
+        btnAlumnoGuardar.addClickListener(event -> {
+            //Datos del alumno
+            String aId = "";
+            String aNombre = txtAlumnoNombre.getValue();
+            String aTipo = cboAlumnoTipo.getSelectedItem().toString().replace("Optional[", "").replace("]", "").toLowerCase();
+            StringTokenizer st = new StringTokenizer(aNombre);
+            String cId = cboAlumnoCurso.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
+
+            Estatus estatus = new Estatus(true, "Alumno guardado");
+
+            if (aNombre.equals("") || aTipo.equals("optional.empty") || cId.equals("Optional.empty")) {
+                estatus.setStatus(false);
+                estatus.setMensaje("Rellena todos los campos");
+            } else {
+                StringTokenizer stC = new StringTokenizer(profe.getCurso().getNombre());
+                while (st.hasMoreElements()) {
+                    aId += st.nextElement().toString().charAt(0);
+                }
+
+                while (stC.hasMoreElements()) {
+                    aId += stC.nextElement().toString().charAt(0);
+                }
+
+                switch (cId) {
+                    case "1":
+                        for (Alumno a : alumnosTodosCurso1) {
+                            if (a.getId().equals(aId)) {
+                                estatus.setStatus(false);
+                                estatus.setMensaje("Alumno ya inscrito en este curso");
+                                break;
+                            } else {
+                                if (alumnosTodosCurso1.size() > 2) {
+                                    estatus.setStatus(false);
+                                    estatus.setMensaje("Curso lleno");
+                                }
+                            }
+                        }
+                        break;
+                    case "2":
+                        for (Alumno a : alumnosTodosCurso2) {
+                            if (a.getId().equals(aId)) {
+                                estatus.setStatus(false);
+                                estatus.setMensaje("Alumno ya inscrito en este curso");
+                                break;
+                            } else {
+                                if (alumnosTodosCurso2.size() > 2) {
+                                    estatus.setStatus(false);
+                                    estatus.setMensaje("Curso lleno");
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+
+            if (estatus.isStatus() == true) {
+                //Datos del curso
+                String cNombre = profe.getCurso().getNombre();
+                String cDuracion = profe.getCurso().getDuracion();
+                String cInicio = profe.getCurso().getfInicio();
+                String cTermino = profe.getCurso().getfTermino();
+                String cHorarios = profe.getCurso().getHorarios();
+                Float cCosto = profe.getCurso().getCosto();
+
+                Curso curso = new Curso(cId, cNombre, cDuracion, cInicio, cTermino, cHorarios, cCosto);
+                Alumno alumno = new Alumno(aId, aNombre, aTipo, curso);
+                repoAlumno.save(alumno);
+                txtAlumnoNombre.setValue("");
+                cboAlumnoTipo.setValue("");
+                cboAlumnoCurso.setValue("");
+                txtCursoInscribir.setValue("");
+                alumnosTodosCurso1 = repoAlumno.find1();
+                alumnosTodosCurso2 = repoAlumno.find2();
+                Notification.show(estatus.getMensaje(), Notification.Type.WARNING_MESSAGE);
+            } else {
+                Notification.show(estatus.getMensaje(), Notification.Type.WARNING_MESSAGE);
+            }
+        });
+        //Termina evento del boton para guardar alumno
+
+
+        //Evento del comboBox para buscar profesor por Id
         cboProfesorMostrarId.addValueChangeListener(event -> {
             profesoresMostrarId.removeAllColumns();
-            String id = cboProfesorMostrarId.getSelectedItem().toString().replace("Optional[","").replace("]","");
+            String id = cboProfesorMostrarId.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
             Profesor profe = repoProfe.findOne(id);
             profesoresMostrarId.setItems(profe);
             profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
             profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
             profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
+            profesoresMostrarId.addColumn(Profesor::getDepartamento).setCaption("Departamento");
             layoutProfesorMostrarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
+        //Termina evento del combobox para buscar profesor por id
+
 
         //Evento del comboBox para eliminar profesor por Id
-            cboProfesorEliminar.addValueChangeListener(event -> {
-            profesoresMostrarId.removeAllColumns();
-            String id = cboProfesorEliminar.getSelectedItem().toString().replace("Optional[","").replace("]","");
+        cboProfesorEliminar.addValueChangeListener(event -> {
+            profesoresEliminar.removeAllColumns();
+            String id = cboProfesorEliminar.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
             Profesor profe = repoProfe.findOne(id);
-            profesoresMostrarId.setItems(profe);
-            profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
-            profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
-            profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
+            profesoresEliminar.setItems(profe);
+            profesoresEliminar.addColumn(Profesor::getId).setCaption("Id");
+            profesoresEliminar.addColumn(Profesor::getNombre).setCaption("Nombre");
+            profesoresEliminar.addColumn(Profesor::getTipo).setCaption("Tipo");
+            profesoresEliminar.addColumn(Profesor::getDepartamento).setCaption("Departamento");
             layoutProfesorEliminar.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
+        //Termina evento del combobox para eliminar profesor por id
 
-        //Evento del comboBox para mostrar curso por Id
-            cboCursos.addValueChangeListener(event -> {
-            cursosMostrarId.removeAllColumns();
-            String id = cboCursos.getSelectedItem().toString().replace("Optional[","").replace("]","");
-            Curso curso = repoCurso.findOne(id);
-            cursosMostrarId.setItems(curso);
-                cursosMostrarId.addColumn(Curso::getIdCurso).setCaption("Id");
-                cursosMostrarId.addColumn(Curso::getNombre).setCaption("Nombre");
-                cursosMostrarId.addColumn(Curso::getDuracion).setCaption("Duración");
-                cursosMostrarId.addColumn(Curso::getfInicio).setCaption("Inicio");
-                cursosMostrarId.addColumn(Curso::getfTermino).setCaption("Fin");
-                cursosMostrarId.addColumn(Curso::getHorarios).setCaption("Horario");
-                cursosMostrarId.addColumn(Curso::getAlumnos).setCaption("Alumnos");
-                cursosMostrarId.addColumn(Curso::getCosto).setCaption("Costo");
-            layoutCursoMostrarId.replaceComponent(cursosMostrarId, cursosMostrarId);
+
+        //Evento del combobox para actualizar profesor
+        cboProfesorActualizar.addValueChangeListener(event -> {
+            String pId = cboProfesorActualizar.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
+            Profesor profe = repoProfe.findOne(pId);
+            txtProfesorActualizarNombre.setValue(profe.getNombre());
+            txtProfesorActualizarTipo.setValue(profe.getTipo());
+            txtProfesorActualizarDepartamento.setValue(profe.getDepartamento());
         });
+        //Termina evento del combobox para eliminar profesor
 
+
+        //Evento del combobox para mostrar curso para inscribir
+        cboAlumnoCurso.addValueChangeListener(event -> {
+            cId = cboAlumnoCurso.getSelectedItem().toString().replace("Optional[", "").replace("]", "");
+            switch (cId) {
+                case "1":
+                    profe = repoProfe.find1();
+                    break;
+                case "2":
+                    profe = repoProfe.find2();
+                    break;
+                case "3":
+                    profe = repoProfe.find3();
+                    break;
+                case "4":
+                    profe = repoProfe.find4();
+                    break;
+                case "5":
+                    profe = repoProfe.find5();
+                    break;
+                case "6":
+                    profe = repoProfe.find6();
+                    break;
+                case "7":
+                    profe = repoProfe.find7();
+                    break;
+                case "8":
+                    profe = repoProfe.find8();
+                    break;
+                case "9":
+                    profe = repoProfe.find9();
+                    break;
+                case "10":
+                    profe = repoProfe.find10();
+                    break;
+            }
+
+            txtCursoInscribir.setValue("Nombre: " + profe.getCurso().getNombre() +
+                    "\nDuración: " + profe.getCurso().getDuracion() +
+                    "\nInicio: " + profe.getCurso().getfInicio() +
+                    "\nTérmino: " + profe.getCurso().getfTermino() +
+                    "\nHorarios: " + profe.getCurso().getHorarios() +
+                    "\nCosto: " + profe.getCurso().getCosto());
+            txtCursoInscribir.setRows(6);
+        });
+        //Termina evento del combobox para mostrar curso para inscribir
     }
 }

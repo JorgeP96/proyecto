@@ -6,10 +6,9 @@ public class Curso {
     private String idCurso;
     private String nombre;
     private String duracion;
-    private Date fInicio;
-    private Date fTermino;
+    private String fInicio;
+    private String fTermino;
     private String horarios;
-    private Integer alumnos;
     private Float costo;
 
     public Curso() {
@@ -19,24 +18,22 @@ public class Curso {
         this.idCurso = idCurso;
     }
 
-    public Curso(String nombre, String duracion, Date fInicio, Date fTermino, String horarios, Integer alumnos, Float costo) {
+    public Curso(String nombre, String duracion, String fInicio, String fTermino, String horarios, Float costo) {
         this.nombre = nombre;
         this.duracion = duracion;
         this.fInicio = fInicio;
         this.fTermino = fTermino;
         this.horarios = horarios;
-        this.alumnos = alumnos;
         this.costo = costo;
     }
 
-    public Curso(String idCurso, String nombre, String duracion, Date fInicio, Date fTermino, String horarios, Integer alumnos, Float costo) {
+    public Curso(String idCurso, String nombre, String duracion, String fInicio, String fTermino, String horarios, Float costo) {
         this.idCurso = idCurso;
         this.nombre = nombre;
         this.duracion = duracion;
         this.fInicio = fInicio;
         this.fTermino = fTermino;
         this.horarios = horarios;
-        this.alumnos = alumnos;
         this.costo = costo;
     }
 
@@ -64,19 +61,19 @@ public class Curso {
         this.duracion = duracion;
     }
 
-    public Date getfInicio() {
+    public String getfInicio() {
         return fInicio;
     }
 
-    public void setfInicio(Date fInicio) {
+    public void setfInicio(String fInicio) {
         this.fInicio = fInicio;
     }
 
-    public Date getfTermino() {
+    public String getfTermino() {
         return fTermino;
     }
 
-    public void setfTermino(Date fTermino) {
+    public void setfTermino(String fTermino) {
         this.fTermino = fTermino;
     }
 
@@ -86,14 +83,6 @@ public class Curso {
 
     public void setHorarios(String horarios) {
         this.horarios = horarios;
-    }
-
-    public Integer getAlumnos() {
-        return alumnos;
-    }
-
-    public void setAlumnos(Integer alumnos) {
-        this.alumnos = alumnos;
     }
 
     public Float getCosto() {
