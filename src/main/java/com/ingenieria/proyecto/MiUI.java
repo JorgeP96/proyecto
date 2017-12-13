@@ -260,7 +260,15 @@ public class MiUI extends UI {
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutAlumnoGuardar.addComponents(lblAlumnoId, txtAlumnoId, lblAlumnoNombre, txtAlumnoNombre, lblAlumnoTipo, txtAlumnoTipo, lblAlumnoCurso, txtAlumnoDepartamento, btnAlumnoGuardar);
 
-
+        //Layout para mostrar todos los alumnos
+        VerticalLayout layoutAlumnosMostrarTodos = new VerticalLayout();
+        alumnosTodos = repoAlumno.findAll();
+        alumnosMostrar.setItems(alumnosTodos);
+        alumnosMostrar.addColumn(Alumno::getId).setCaption("Id");
+        alumnosMostrar.addColumn(Alumno::getNombre).setCaption("Nombre");
+        alumnosMostrar.addColumn(Alumno::getTipo).setCaption("Tipo");
+        alumnosMostrar.addColumn(Alumno::getCurso).setCaption("Curso");
+        layoutAlumnosMostrarTodos.addComponent(alumnosMostrar);
 
 
         MenuBar menuPrincipal = new MenuBar();
