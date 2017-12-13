@@ -2,9 +2,7 @@ package com.ingenieria.proyecto;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.dd.acceptcriteria.Not;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.*;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button;
@@ -14,6 +12,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,8 @@ public class MiUI extends UI {
     RepositorioProfesor repoProfe;
     @Autowired
     RepositorioCurso repoCurso;
+    @Autowired
+    RepositorioAlumno repoAlumno;
 
     Grid<Profesor> profesoresMostrar = new Grid<>();
     Grid<Profesor> profesoresMostrarId = new Grid<>();
@@ -33,7 +34,11 @@ public class MiUI extends UI {
 
     Grid<Curso> cursosMostrar = new Grid<>();
     Grid<Curso> cursosMostrarId = new Grid<>();
-    List<Curso>cursosTodos = new ArrayList<>();
+    List<Curso> cursosTodos = new ArrayList<>();
+
+    Grid<Alumno> alumnosMostrar = new Grid<>();
+    Grid<Alumno> alumnosMostrarId = new Grid<>();
+    List<Alumno>alumnosTodos = new ArrayList<>();
 
 
     @Override
@@ -245,13 +250,20 @@ public class MiUI extends UI {
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         layoutAlumnoGuardar.addComponents(lblAlumnoId, txtAlumnoId, lblAlumnoNombre, txtAlumnoNombre, lblAlumnoTipo, txtAlumnoTipo, lblAlumnoCurso, txtAlumnoDepartamento, btnAlumnoGuardar);
 
-        ThemeResource resource = new ThemeResource("../egel.png");
-        Image imagen = new Image(null, resource);
+        //Layout para mostrar todos los alumnos
+        VerticalLayout layoutAlumnosMostrarTodos = new VerticalLayout();
+        alumnosTodos = repoAlumno.findAll();
+        alumnosMostrar.setItems(alumnosTodos);
+        alumnosMostrar.addColumn(Alumno::getId).setCaption("Id");
+        alumnosMostrar.addColumn(Alumno::getNombre).setCaption("Nombre");
+        alumnosMostrar.addColumn(Alumno::getTipo).setCaption("Tipo");
+        alumnosMostrar.addColumn(Alumno::getCurso).setCaption("Curso");
+        layoutAlumnosMostrarTodos.addComponent(alumnosMostrar);
 
-        //Inicia menú principal
+
         MenuBar menuPrincipal = new MenuBar();
         MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores",new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"),null);
-        MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos",new ExternalResource("https://www.dropbox.com/s/a9io8l9m4l7vs8n/padnote.png"), null);
+        MenuBar.MenuItem cursos = menuPrincipal.addItem("Cursos" , null);
         MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", null);
 
         //Inicia submenú profesores
