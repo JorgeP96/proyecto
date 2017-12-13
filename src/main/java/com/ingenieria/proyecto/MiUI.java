@@ -30,10 +30,8 @@ public class MiUI extends UI {
 
     //Grid para mostrar todos los profesores
     Grid<Profesor> profesoresMostrar = new Grid<>();
-
     //Grid para mostrar profesor por Id
     Grid<Profesor> profesoresMostrarId = new Grid<>();
-
     //Lista para guardar todos
     List<Profesor> profesoresTodos = new ArrayList<>();
 
@@ -83,53 +81,55 @@ public class MiUI extends UI {
         //Termina layout para mostrar todos los profesores
 
 
-        //Inicia layout para actualizar profesores
+        //Inicia layout para actualizar profesor
         VerticalLayout layoutProfesorActualizar = new VerticalLayout();
-        ComboBox<Profesor> cboActualizarPro = new ComboBox<>();
-        List<String> actualizarPro = new ArrayList<>();
-        cboActualizarPro.clear();
-        actualizarPro.add("Seleccione");
+        ComboBox<Profesor> cboProfesorActualizar = new ComboBox<>();
+        List<String> idProfes = new ArrayList<>();
+        cboProfesorActualizar.clear();
         for (Profesor p : profesoresTodos) {
-            actualizarPro.add(p.getId());
+            idProfes.add(p.getId());
         }
-        cboActualizarPro.setItems((List) actualizarPro);
-
+        cboProfesorActualizar.setItems((List) idProfes);
+        cboProfesorActualizar.setScrollToSelectedItem(true);
         Label lblProfesorActualizarNombre = new Label("Nombre: ");
         TextField txtProfesorActualizarNombre = new TextField();
         Label lblProfesorActualizarTipo = new Label("Tipo: ");
         TextField txtProfesorActualizarTipo = new TextField();
         Label lblProfesorActualizarDepartamento = new Label("Departamento: ");
         TextField txtProfesorActualizarDepartamento = new TextField();
+        Label lblProfesorActualizarCurso = new Label("Curso: ");
+        TextField txtProfesorActualizarCurso = new TextField();
         Button btnProfesorActualizar = new Button("Actualizar");
         btnProfesorActualizar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
-        layoutProfesorActualizar.addComponents(cboActualizarPro, lblProfesorActualizarNombre, txtProfesorActualizarNombre, lblProfesorActualizarTipo, txtProfesorActualizarTipo, lblProfesorActualizarDepartamento, txtProfesorActualizarDepartamento, btnProfesorActualizar);
+        layoutProfesorActualizar.addComponents(cboProfesorActualizar, lblProfesorActualizarNombre, txtProfesorActualizarNombre, lblProfesorActualizarTipo, txtProfesorActualizarTipo, lblProfesorActualizarDepartamento, txtProfesorActualizarDepartamento, lblProfesorActualizarCurso, txtProfesorActualizarCurso,btnProfesorActualizar);
+        //Termina layout para actualizar profesor
 
         //Layout para mostrar profesor por Id
         VerticalLayout layoutProfesorMostrarId = new VerticalLayout();
-        ComboBox<Profesor> cboProfesor = new ComboBox<>();
+        ComboBox<Profesor> cboProfesorMostrarId = new ComboBox<>();
         List<String> pro = new ArrayList<>();
-        cboProfesor.clear();
+        cboProfesorMostrarId.clear();
         pro.add("Seleccione");
         for (Profesor p : profesoresTodos) {
             pro.add(p.getId());
         }
-        cboProfesor.setItems((List) pro);
-        layoutProfesorMostrarId.addComponents(cboProfesor, profesoresMostrarId);
+        cboProfesorMostrarId.setItems((List) pro);
+        layoutProfesorMostrarId.addComponents(cboProfesorMostrarId, profesoresMostrarId);
 
         //Layout para eliminar profesor por Id
-        VerticalLayout layoutProfesorEliminarId = new VerticalLayout();
-        ComboBox<Profesor> cboEliminarPro = new ComboBox<>("Seleccione");
+        VerticalLayout layoutProfesorEliminar = new VerticalLayout();
+        ComboBox<Profesor> cboProfesorEliminar = new ComboBox<>("Seleccione");
         List<String> eliminarPro = new ArrayList<>();
-        cboEliminarPro.clear();
+        cboProfesorEliminar.clear();
         for (Profesor p : profesoresTodos) {
             eliminarPro.add(p.getId());
         }
-        cboEliminarPro.setItems((List) eliminarPro);
+        cboProfesorEliminar.setItems((List) eliminarPro);
 
         Button btnEliminarPro = new Button("Eliminar");
         btnEliminarPro.addStyleName(ValoTheme.BUTTON_DANGER );
 
-        layoutProfesorEliminarId.addComponents(cboEliminarPro, profesoresMostrarId, btnEliminarPro);
+        layoutProfesorEliminar.addComponents(cboProfesorEliminar, profesoresMostrarId, btnEliminarPro);
 
         //Inicia layout para guardar cursos
         VerticalLayout layoutCursoGuardar = new VerticalLayout();
@@ -292,7 +292,7 @@ public class MiUI extends UI {
         profesores.addSeparator();
         profesores.addItem("Eliminar", null, selectedItem -> {
             layout.removeAllComponents();
-            layout.addComponents(layoutPrincipal, layoutProfesorEliminarId);
+            layout.addComponents(layoutPrincipal, layoutProfesorEliminar);
             setContent(layout);
         });
         profesores.addSeparator();
@@ -393,21 +393,22 @@ public class MiUI extends UI {
                 txtProfesorDepartamento.setValue("");
                 Notification.show(estatus.getMensaje(), Notification.Type.WARNING_MESSAGE);
                 profesoresTodos = repoProfe.findAll();
-                cboProfesor.clear();
-                cboActualizarPro.clear();
+                cboProfesorMostrarId.clear();
+                cboProfesorActualizar.clear();
+                cboProfesorEliminar
                 for (Profesor p : profesoresTodos) {
                     pro.add(p.getId());
                 }
-                cboProfesor.setItems((List) pro);
+                cboProfesorMostrarId.setItems((List) pro);
             } else {
                 Notification.show(estatus.getMensaje(), Notification.Type.ERROR_MESSAGE);
             }
         });
 
         //Evento del comboBox para mostrar profesor por Id
-        cboProfesor.addValueChangeListener(event -> {
+        cboProfesorMostrarId.addValueChangeListener(event -> {
             profesoresMostrarId.removeAllColumns();
-            String id = cboProfesor.getSelectedItem().toString().replace("Optional[","").replace("]","");
+            String id = cboProfesorMostrarId.getSelectedItem().toString().replace("Optional[","").replace("]","");
             Profesor profe = repoProfe.findOne(id);
             profesoresMostrarId.setItems(profe);
             profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
@@ -417,15 +418,15 @@ public class MiUI extends UI {
         });
 
         //Evento del comboBox para eliminar profesor por Id
-            cboEliminarPro.addValueChangeListener(event -> {
+            cboProfesorEliminar.addValueChangeListener(event -> {
             profesoresMostrarId.removeAllColumns();
-            String id = cboEliminarPro.getSelectedItem().toString().replace("Optional[","").replace("]","");
+            String id = cboProfesorEliminar.getSelectedItem().toString().replace("Optional[","").replace("]","");
             Profesor profe = repoProfe.findOne(id);
             profesoresMostrarId.setItems(profe);
             profesoresMostrarId.addColumn(Profesor::getId).setCaption("Id");
             profesoresMostrarId.addColumn(Profesor::getNombre).setCaption("Nombre");
             profesoresMostrarId.addColumn(Profesor::getTipo).setCaption("Tipo");
-            layoutProfesorEliminarId.replaceComponent(profesoresMostrarId, profesoresMostrarId);
+            layoutProfesorEliminar.replaceComponent(profesoresMostrarId, profesoresMostrarId);
         });
 
         //Evento del comboBox para mostrar curso por Id
