@@ -71,10 +71,10 @@ public class MiUI extends UI {
 
         //Inicia layout para actualizar profesores
         VerticalLayout layoutProfesorActualizar = new VerticalLayout();
-
-        ComboBox<Profesor> cboActualizarPro = new ComboBox<>("Seleccione");
+        ComboBox<Profesor> cboActualizarPro = new ComboBox<>();
         List<String> actualizarPro = new ArrayList<>();
         cboActualizarPro.clear();
+        actualizarPro.add("Seleccione");
         for (Profesor p : profesoresTodos) {
             actualizarPro.add(p.getId());
         }
