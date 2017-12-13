@@ -180,7 +180,7 @@ public class MiUI extends UI {
         TextArea txtCursoInscribir = new TextArea();
         txtCursoInscribir.setIcon(VaadinIcons.INFO);
         txtCursoInscribir.setEnabled(false);
-        Button btnAlumnoGuardar = new Button("Guardar");
+        Button btnAlumnoGuardar = new Button("Inscribir");
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         lGuardarAlumno.addComponents(txtNombreAlumno, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
         //Termina layout para guardar alumnos
