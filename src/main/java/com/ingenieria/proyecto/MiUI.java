@@ -92,9 +92,10 @@ public class MiUI extends UI {
 
         //Layout para mostrar profesor por Id
         VerticalLayout layoutProfesorMostrarId = new VerticalLayout();
-        ComboBox<Profesor> cboProfesor = new ComboBox<>("Seleccione");
+        ComboBox<Profesor> cboProfesor = new ComboBox<>();
         List<String> pro = new ArrayList<>();
         cboProfesor.clear();
+        pro.add("Seleccione");
         for (Profesor p : profesoresTodos) {
             pro.add(p.getId());
         }
