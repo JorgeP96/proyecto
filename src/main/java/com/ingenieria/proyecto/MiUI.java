@@ -3,6 +3,7 @@ package com.ingenieria.proyecto;
 import com.vaadin.annotations.Theme;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.*;
+import com.vaadin.shared.ui.ValueChangeMode;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -180,6 +181,7 @@ public class MiUI extends UI {
         txtCursoInscribir.setIcon(VaadinIcons.INFO);
         txtCursoInscribir.setEnabled(false);
         Button btnAlumnoGuardar = new Button("Guardar");
+        btnAlumnoGuardar.setEnabled(false);
         btnAlumnoGuardar.addStyleName(ValoTheme.BUTTON_FRIENDLY);
         lGuardarAlumno.addComponents(txtNombreAlumno, cboAlumnoTipo, cboAlumnoCurso, txtCursoInscribir, btnAlumnoGuardar);
         //Termina layout para guardar alumnos
@@ -190,18 +192,18 @@ public class MiUI extends UI {
         estadisticas1.setEnabled(false);
         TextArea estadisticas2 = new TextArea();
         estadisticas2.setEnabled(false);
-        if(alumnosTodosCurso1.size() > 0)
-        estadisticas1.setValue("Curso: " + alumnosTodosCurso1.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso1.size());
-        if(alumnosTodosCurso2.size() > 0)
-        estadisticas2.setValue("Curso: " + alumnosTodosCurso2.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso2.size());
+        if (alumnosTodosCurso1.size() > 0)
+            estadisticas1.setValue("Curso: " + alumnosTodosCurso1.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso1.size());
+        if (alumnosTodosCurso2.size() > 0)
+            estadisticas2.setValue("Curso: " + alumnosTodosCurso2.get(0).getCurso().getNombre() + " Alumnos: " + alumnosTodosCurso2.size());
 
         layoutEstadistica.addComponents(estadisticas1, estadisticas2);
         //Termina layout para mostrar estadisticas
 
 
         MenuBar menuPrincipal = new MenuBar();
-            MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"), null);
-        MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", new ExternalResource("https://www.flaticon.com/free-icon/graduate-student-avatar_67902#term=student&page=1&position=6"),null);
+        MenuBar.MenuItem profesores = menuPrincipal.addItem("Profesores", new ExternalResource("https://image.flaticon.com/icons/svg/42/42912.svg"), null);
+        MenuBar.MenuItem alumnos = menuPrincipal.addItem("Alumnos", VaadinIcons.ACADEMY_CAP, null);
 
         //Inicia submenú profesores
         profesores.addSeparator();
@@ -239,13 +241,13 @@ public class MiUI extends UI {
 
         //Inicia submenú alumnos
         alumnos.addSeparator();
-        alumnos.addItem("Inscripción", null, selectedItem -> {
+        alumnos.addItem("Inscripción", VaadinIcons.HANDSHAKE, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, lGuardarAlumno);
             setContent(layout);
         });
         alumnos.addSeparator();
-        alumnos.addItem("Estadísticas", null, selectedItem -> {
+        alumnos.addItem("Estadísticas", VaadinIcons.TABLE, selectedItem -> {
             layout.removeAllComponents();
             layout.addComponents(layoutPrincipal, layoutEstadistica);
             setContent(layout);
@@ -526,7 +528,7 @@ public class MiUI extends UI {
                     "\nDuración: " + profe.getCurso().getDuracion() +
                     "\nInicio: " + profe.getCurso().getfInicio() +
                     "\nTérmino: " + profe.getCurso().getfTermino() +
-                    "\nHorarios: " + profe.getCurso().getHorarios() +
+                    "\nHorarios:" + profe.getCurso().getHorarios() +
                     "\nCosto: " + profe.getCurso().getCosto());
             txtCursoInscribir.setRows(6);
         });
